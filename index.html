@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>定投收益计算工具</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>定投收益计算工具</h1>
+            <p>支持每周定投和每月定投两种方式，帮助您测算长期收益</p>
+        </header>
+
+        <main>
+            <section class="input-section">
+                <h2>投资参数设置</h2>
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="investmentFrequency">定投频率</label>
+                        <select id="investmentFrequency">
+                            <option value="weekly">每周定投</option>
+                            <option value="monthly">每月定投</option>
+                        </select>
+                    </div>
+                    <div class="input-item">
+                        <label for="weeklyAmount" id="amountLabel">每周定投金额 (元)</label>
+                        <input type="number" id="weeklyAmount" min="0" step="0.01" placeholder="例如: 100">
+                        <div class="error-message" id="weeklyAmountError"></div>
+                    </div>
+                    <div class="input-item">
+                        <label for="initialAmount">期初已有资产 (元)</label>
+                        <input type="number" id="initialAmount" min="0" step="0.01" placeholder="例如: 100000">
+                        <div class="error-message" id="initialAmountError"></div>
+                    </div>
+                    <div class="input-item">
+                        <label for="completedYears">已完成定投年限 (年)</label>
+                        <input type="number" id="completedYears" min="0" max="50" step="1" placeholder="例如: 1">
+                        <div class="error-message" id="completedYearsError"></div>
+                    </div>
+                    <div class="input-item">
+                        <label for="historicalInvestment">历史累计投入 (元)</label>
+                        <input type="number" id="historicalInvestment" min="0" step="0.01" placeholder="例如: 120000">
+                        <div class="error-message" id="historicalInvestmentError"></div>
+                    </div>
+                    <div class="input-item">
+                        <label for="annualRate">一次性投入预期年化收益率 (%)</label>
+                        <input type="number" id="annualRate" min="0" max="100" step="0.01" placeholder="例如: 8">
+                        <div class="error-message" id="annualRateError"></div>
+                    </div>
+                    <div class="input-item">
+                        <label for="investmentYears">后续定投年限 (年)</label>
+                        <input type="number" id="investmentYears" min="1" max="50" step="1" placeholder="例如: 10">
+                        <div class="error-message" id="investmentYearsError"></div>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button id="calculateBtn" class="primary-btn">计算收益</button>
+                    <button id="resetBtn" class="secondary-btn">重置</button>
+                </div>
+            </section>
+
+            <section class="result-section hidden" id="resultSection">
+                <h2>计算结果</h2>
+                
+                <div class="result-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">总投入金额:</span>
+                        <span class="summary-value" id="totalInvestment">0 元</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">最终总资产:</span>
+                        <span class="summary-value highlight" id="finalTotal">0 元</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">总收益金额:</span>
+                        <span class="summary-value profit" id="totalProfit">0 元</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">收益率:</span>
+                        <span class="summary-value profit" id="totalReturnRate">0%</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">定投后实际年化:</span>
+                        <span class="summary-value profit" id="actualAnnualizedRate">0%</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="resultTable">
+                        <thead>
+                            <tr>
+                                <th>年份</th>
+                                <th id="amountHeader">每周定投</th>
+                                <th>年初资产</th>
+                                <th>当年投入</th>
+                                <th>预期年化</th>
+                                <th>实际年化</th>
+                                <th>当年收益</th>
+                                <th>累计收益</th>
+                                <th>总资产</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 计算结果将通过JavaScript动态填充 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-tabs">
+                        <button class="chart-tab active" data-chart="totalAssets">总资产趋势</button>
+                        <button class="chart-tab" data-chart="annualReturns">年度收益对比</button>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="resultChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="help-section">
+                <h2>使用说明</h2>
+                <div class="help-content">
+                    <div class="help-item">
+                        <h3>输入说明</h3>
+                        <ul>
+                            <li>定投频率: 支持每周定投或每月定投</li>
+                            <li id="amountHelpText">每周定投金额: 支持正整数或带两位小数的数值</li>
+                            <li>期初已有资产: 当前已经持有的资产，会从后续第一期开始继续复利</li>
+                            <li>已完成定投年限和历史累计投入: 用于阶段性接力计算，可留空按从零开始计算</li>
+                            <li>一次性投入预期年化收益率: 支持0-100之间的数值，可带两位小数</li>
+                            <li>后续定投年限: 支持1-50之间的正整数</li>
+                        </ul>
+                    </div>
+                    <div class="help-item">
+                        <h3>计算逻辑</h3>
+                        <p id="logicDescription">本工具采用复利计算方式，假设每周定投金额固定，输入的年化收益率表示一次性投入时的预期年化收益水平，并据此模拟定投后的实际表现。计算公式基于以下假设：</p>
+                        <ul>
+                            <li id="amountAssumption">每周定投金额固定</li>
+                            <li id="rateAssumption">输入的预期年化收益率会换算为等价周收益率后按周复利计算</li>
+                            <li>期初已有资产会作为阶段开始时的存量资产继续参与后续复利</li>
+                            <li>历史累计投入会纳入总投入和累计收益，但不会重复计入后续当年投入</li>
+                            <li>实际年化按总投入资金视角折算，反映分批入场后被摊薄的年化表现</li>
+                            <li>收益自动再投资，产生复利效应</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>© 2025 定投收益计算工具 | 仅供参考，实际投资收益可能有所不同</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
