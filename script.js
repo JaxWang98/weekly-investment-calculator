@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const weeklyAmountInput = document.getElementById('weeklyAmount');
     const initialAmountInput = document.getElementById('initialAmount');
     const completedYearsInput = document.getElementById('completedYears');
-    const historicalInvestmentInput = document.getElementById('historicalInvestment');
+    const stageAssetInput = document.getElementById('stageAsset');
+    const stageInvestmentInput = document.getElementById('stageInvestment');
     const annualRateInput = document.getElementById('annualRate');
     const investmentYearsInput = document.getElementById('investmentYears');
     const calculateBtn = document.getElementById('calculateBtn');
@@ -32,7 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
     weeklyAmountInput.addEventListener('input', () => validateInput(weeklyAmountInput, validateWeeklyAmount));
     initialAmountInput.addEventListener('input', () => validateInput(initialAmountInput, validateInitialAmount));
     completedYearsInput.addEventListener('input', () => validateInput(completedYearsInput, validateCompletedYears));
-    historicalInvestmentInput.addEventListener('input', () => validateInput(historicalInvestmentInput, validateHistoricalInvestment));
+    stageAssetInput.addEventListener('input', () => validateInput(stageAssetInput, validateStageAsset));
+    stageInvestmentInput.addEventListener('input', () => validateInput(stageInvestmentInput, validateStageInvestment));
     annualRateInput.addEventListener('input', () => validateInput(annualRateInput, validateAnnualRate));
     investmentYearsInput.addEventListener('input', () => validateInput(investmentYearsInput, validateInvestmentYears));
     
@@ -131,21 +133,30 @@ function validateWeeklyAmount(value) {
 }
 
 /**
- * 验证期初已有资产
+ * 验证初始资产
  * @param {string} value - 输入值
  * @returns {string} - 错误信息，如果验证通过则返回空字符串
  */
 function validateInitialAmount(value) {
-    return validateOptionalAmount(value, '期初已有资产');
+    return validateOptionalAmount(value, '初始资产');
 }
 
 /**
- * 验证历史累计投入
+ * 验证阶段性资产
  * @param {string} value - 输入值
  * @returns {string} - 错误信息，如果验证通过则返回空字符串
  */
-function validateHistoricalInvestment(value) {
-    return validateOptionalAmount(value, '历史累计投入');
+function validateStageAsset(value) {
+    return validateOptionalAmount(value, '阶段性资产');
+}
+
+/**
+ * 验证阶段累计投入
+ * @param {string} value - 输入值
+ * @returns {string} - 错误信息，如果验证通过则返回空字符串
+ */
+function validateStageInvestment(value) {
+    return validateOptionalAmount(value, '阶段累计投入');
 }
 
 /**
@@ -232,10 +243,14 @@ function calculateInvestment() {
     const weeklyAmount = parseFloat(document.getElementById('weeklyAmount').value);
     const initialAmountValue = document.getElementById('initialAmount').value;
     const completedYearsValue = document.getElementById('completedYears').value;
-    const historicalInvestmentValue = document.getElementById('historicalInvestment').value;
+    const stageAssetValue = document.getElementById('stageAsset').value;
+    const stageInvestmentValue = document.getElementById('stageInvestment').value;
     const initialAmount = initialAmountValue ? parseFloat(initialAmountValue) : 0;
     const completedYears = completedYearsValue ? parseInt(completedYearsValue) : 0;
-    const historicalInvestment = historicalInvestmentValue ? parseFloat(historicalInvestmentValue) : initialAmount;
+    const stageAsset = stageAssetValue ? parseFloat(stageAssetValue) : 0;
+    const stageInvestment = stageInvestmentValue ? parseFloat(stageInvestmentValue) : 0;
+    const startingAmount = initialAmount + stageAsset;
+    const startingInvestment = initialAmount + stageInvestment;
     const annualRate = parseFloat(document.getElementById('annualRate').value) / 100;
     const investmentYears = parseInt(document.getElementById('investmentYears').value);
     const frequencyConfig = getFrequencyConfig();
@@ -245,7 +260,8 @@ function calculateInvestment() {
     const isWeeklyAmountValid = validateInput(document.getElementById('weeklyAmount'), validateWeeklyAmount);
     const isInitialAmountValid = validateInput(document.getElementById('initialAmount'), validateInitialAmount);
     const isCompletedYearsValid = validateInput(document.getElementById('completedYears'), validateCompletedYears);
-    const isHistoricalInvestmentValid = validateInput(document.getElementById('historicalInvestment'), validateHistoricalInvestment);
+    const isStageAssetValid = validateInput(document.getElementById('stageAsset'), validateStageAsset);
+    const isStageInvestmentValid = validateInput(document.getElementById('stageInvestment'), validateStageInvestment);
     const isAnnualRateValid = validateInput(document.getElementById('annualRate'), validateAnnualRate);
     const isInvestmentYearsValid = validateInput(document.getElementById('investmentYears'), validateInvestmentYears);
     
@@ -254,7 +270,8 @@ function calculateInvestment() {
         !isWeeklyAmountValid ||
         !isInitialAmountValid ||
         !isCompletedYearsValid ||
-        !isHistoricalInvestmentValid ||
+        !isStageAssetValid ||
+        !isStageInvestmentValid ||
         !isAnnualRateValid ||
         !isInvestmentYearsValid
     ) {
@@ -267,8 +284,8 @@ function calculateInvestment() {
     // 初始化结果数组
     calculationResults = [];
     // 计算每年的投资结果
-    let totalAmount = initialAmount;
-    let totalInvestment = historicalInvestment;
+    let totalAmount = startingAmount;
+    let totalInvestment = startingInvestment;
     
     for (let year = 1; year <= investmentYears; year++) {
         const displayYear = completedYears + year;
@@ -566,7 +583,8 @@ function resetForm() {
     document.getElementById('weeklyAmount').value = '';
     document.getElementById('initialAmount').value = '';
     document.getElementById('completedYears').value = '';
-    document.getElementById('historicalInvestment').value = '';
+    document.getElementById('stageAsset').value = '';
+    document.getElementById('stageInvestment').value = '';
     document.getElementById('annualRate').value = '';
     document.getElementById('investmentYears').value = '';
     currentFrequency = 'weekly';
@@ -576,7 +594,8 @@ function resetForm() {
     document.getElementById('weeklyAmountError').textContent = '';
     document.getElementById('initialAmountError').textContent = '';
     document.getElementById('completedYearsError').textContent = '';
-    document.getElementById('historicalInvestmentError').textContent = '';
+    document.getElementById('stageAssetError').textContent = '';
+    document.getElementById('stageInvestmentError').textContent = '';
     document.getElementById('annualRateError').textContent = '';
     document.getElementById('investmentYearsError').textContent = '';
     
@@ -584,7 +603,8 @@ function resetForm() {
     document.getElementById('weeklyAmount').classList.remove('error');
     document.getElementById('initialAmount').classList.remove('error');
     document.getElementById('completedYears').classList.remove('error');
-    document.getElementById('historicalInvestment').classList.remove('error');
+    document.getElementById('stageAsset').classList.remove('error');
+    document.getElementById('stageInvestment').classList.remove('error');
     document.getElementById('annualRate').classList.remove('error');
     document.getElementById('investmentYears').classList.remove('error');
     

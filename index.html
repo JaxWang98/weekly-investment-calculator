@@ -31,19 +31,27 @@
                         <div class="error-message" id="weeklyAmountError"></div>
                     </div>
                     <div class="input-item">
-                        <label for="initialAmount">期初已有资产 (元)</label>
-                        <input type="number" id="initialAmount" min="0" step="0.01" placeholder="例如: 100000">
-                        <div class="error-message" id="initialAmountError"></div>
-                    </div>
-                    <div class="input-item">
                         <label for="completedYears">已完成定投年限 (年)</label>
                         <input type="number" id="completedYears" min="0" max="50" step="1" placeholder="例如: 1">
                         <div class="error-message" id="completedYearsError"></div>
                     </div>
                     <div class="input-item">
-                        <label for="historicalInvestment">历史累计投入 (元)</label>
-                        <input type="number" id="historicalInvestment" min="0" step="0.01" placeholder="例如: 120000">
-                        <div class="error-message" id="historicalInvestmentError"></div>
+                        <label for="initialAmount">初始资产 (元)</label>
+                        <input type="number" id="initialAmount" min="0" step="0.01" placeholder="例如: 100000">
+                        <div class="field-hint">开始定投前已有的钱，会在本次计算第 0 天一次性投入。</div>
+                        <div class="error-message" id="initialAmountError"></div>
+                    </div>
+                    <div class="input-item">
+                        <label for="stageAsset">阶段性资产 (元)</label>
+                        <input type="number" id="stageAsset" min="0" step="0.01" placeholder="例如: 125000">
+                        <div class="field-hint">上一阶段定投结束后的当前总资产，会继续参与后续复利。</div>
+                        <div class="error-message" id="stageAssetError"></div>
+                    </div>
+                    <div class="input-item">
+                        <label for="stageInvestment">阶段累计投入 (元)</label>
+                        <input type="number" id="stageInvestment" min="0" step="0.01" placeholder="例如: 120000">
+                        <div class="field-hint">上一阶段实际投入本金，例如第一年每月 1 万就是 120000。</div>
+                        <div class="error-message" id="stageInvestmentError"></div>
                     </div>
                     <div class="input-item">
                         <label for="annualRate">一次性投入预期年化收益率 (%)</label>
@@ -59,6 +67,9 @@
                 <div class="button-group">
                     <button id="calculateBtn" class="primary-btn">计算收益</button>
                     <button id="resetBtn" class="secondary-btn">重置</button>
+                </div>
+                <div class="input-note">
+                    <strong>初始资产</strong>用于从一开始就一次性投入的资金，例如拿 10 万直接开始定投组合；<strong>阶段性资产</strong>用于接着上一段定投继续算，例如第一年累计投入 12 万、收益 5000、当前总资产 125000，就填写阶段性资产 125000、阶段累计投入 120000、已完成定投年限 1。
                 </div>
             </section>
 
@@ -128,8 +139,10 @@
                         <ul>
                             <li>定投频率: 支持每周定投或每月定投</li>
                             <li id="amountHelpText">每周定投金额: 支持正整数或带两位小数的数值</li>
-                            <li>期初已有资产: 当前已经持有的资产，会从后续第一期开始继续复利</li>
-                            <li>已完成定投年限和历史累计投入: 用于阶段性接力计算，可留空按从零开始计算</li>
+                            <li>初始资产: 开始定投前已有并准备一次性投入的资金</li>
+                            <li>阶段性资产: 已经定投一段时间后的当前总资产，会继续参与后续复利</li>
+                            <li>阶段累计投入: 形成阶段性资产时实际投入的本金，用于计算累计收益和实际年化</li>
+                            <li>已完成定投年限: 阶段性资产已经经历的定投时间，用于从下一年继续展示结果</li>
                             <li>一次性投入预期年化收益率: 支持0-100之间的数值，可带两位小数</li>
                             <li>后续定投年限: 支持1-50之间的正整数</li>
                         </ul>
@@ -140,8 +153,9 @@
                         <ul>
                             <li id="amountAssumption">每周定投金额固定</li>
                             <li id="rateAssumption">输入的预期年化收益率会换算为等价周收益率后按周复利计算</li>
-                            <li>期初已有资产会作为阶段开始时的存量资产继续参与后续复利</li>
-                            <li>历史累计投入会纳入总投入和累计收益，但不会重复计入后续当年投入</li>
+                            <li>初始资产会在本次计算开始时一次性进入复利</li>
+                            <li>阶段性资产会作为上一阶段结束后的存量资产继续复利，不会被当成后续新增投入</li>
+                            <li>阶段累计投入会纳入总投入和累计收益，但不会重复计入后续当年投入</li>
                             <li>实际年化按总投入资金视角折算，反映分批入场后被摊薄的年化表现</li>
                             <li>收益自动再投资，产生复利效应</li>
                         </ul>

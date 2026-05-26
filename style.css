@@ -94,6 +94,28 @@ header p {
     min-height: 20px;
 }
 
+.field-hint {
+    color: #6c757d;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    margin-top: 6px;
+}
+
+.input-note {
+    background-color: #f8f9fa;
+    border-left: 4px solid #4263eb;
+    border-radius: 4px;
+    color: #495057;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-top: 20px;
+    padding: 14px 16px;
+}
+
+.input-note strong {
+    color: #2c3e50;
+}
+
 .button-group {
     display: flex;
     gap: 15px;
